@@ -4,5 +4,6 @@ SI x = <1> ALORS.
     REPETER.
         IMPRIMER 1.
     FIN.
+SINON.
+    AFFICHER 0.
 FIN.
-AFFICHER 0.

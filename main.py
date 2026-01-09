@@ -56,15 +56,16 @@ def scan_end(lines,line_bloc):
         keyword = lines[i].split()[0]
         if keyword == "REPETER": stack.append(("REPETER", i))
         if keyword == "SI": stack.append(("SI", i))
-        if keyword == "FIN":
+        if keyword == "FIN" or keyword == "SINON":
             value = stack.pop()
-            if value[1] == line_bloc:
-                return i #retourn l'addresse de FIN du block specifier (pour les si)
+            if value[1] == line_bloc and (value[0] == "SI" or keyword == "FIN"):
+                return i , keyword #retourn l'addresse de FIN du block specifier (pour les si)
+        if keyword == "SINON": stack.append(("SINON", i))#ajoute comme un arg si ce n'est pas celuis du retour
 
 def eval_line(line:str,pro:int,program):
     global variable,type_list
     line = line.lstrip()
-    keyword = ["VARIABLE","METTRE","AFFICHER","REPETER","FIN","STOP","SI","IMPRIMER"]
+    keyword = ["VARIABLE","METTRE","AFFICHER","REPETER","FIN","STOP","SI","IMPRIMER","SINON"]
     line_split = line.split()
     keyword_use = line_split[0]
     if keyword_use in keyword:
@@ -100,8 +101,11 @@ def eval_line(line:str,pro:int,program):
                 value , line = code_stack.pop()
                 if value == "rep":
                     return line
-
-            case"STOP":
+            case "SINON":
+                code_stack.append(("SINON",pro))
+                if not scan_end(program,pro):
+                    raise TypeError("pas de fin d'un sinon")
+            case "STOP":
                 last_repeter = scan_program(program,pro,"REPETER")
                 jmp_to = scan_end(program,last_repeter)
                 return jmp_to + 1
@@ -111,8 +115,8 @@ def eval_line(line:str,pro:int,program):
                 value , type = eval_expr(expr)
                 value = bool_replace(type, value)
                 if value != "VRAIS":
-                    jmp_to = scan_end(program,pro)
-                    return jmp_to + 1
+                    jmp_to , keyword = scan_end(program,pro)
+                    return jmp_to + (1 if keyword == "FIN" else 0)
     return  pro + 1
 def bool_replace(type,value):
     if type == "bool":
