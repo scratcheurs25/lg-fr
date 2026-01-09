@@ -1,0 +1,29 @@
+BIBLIOTEQUE standard.
+
+STRUCTURE Nombre.
+AJOUTER valeur TYPE ENTIER à Nombre.
+
+FONCTION afficher : valeur TYPE TEXT.
+    EXECUTER afficher DE standard: valeur.
+FIN.
+
+FONCTION au_carré ENVOYER Nombre POUR STRUCTURE Nombre : ?Instance.
+    VARIABLE valeur TYPE ENTIER
+    METTRE valeur à valeur DE Instance
+    METTRE valeur à (valeur * valeur).
+    METTRE valeur DE Instance à valeur
+    ENVOYER Instance.
+FIN.
+
+VARIABLE nombre NOUVELLE STRUCTURE Nombre.
+METTRE valeur DE nombre à (25*3).
+VARIABLE result TYPE ENTIER.
+REPETER.
+    METTRE nombre à EXECUTER au_carré DE nombre : .
+    SI valeur DE nombre > 1000 ALORS.
+        STOP.
+    FIN.
+FIN.
+
+METTRE result à valeur DE nombre.
+EXECUTER afficher : result COMME TEXT.
