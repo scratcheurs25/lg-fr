@@ -201,6 +201,7 @@ def eval_expr(expr : str):
                 if do_op == "=":return int(value_left == value_right) , "bool"
             if type_left == "str":
                 if do_op == "+":return value_left + value_right , "str"
+                if do_op == "=": return int(value_left == value_right), "bool"
             if type_left == "bool":
                 if do_op == "!": return 1 - value_right , "bool"
     else:
