@@ -1,2 +1,2 @@
-*.lfr linguist-language=lg-fr
+*.lfr linguist-language=Brainfuck
 *.py linguist-detectable=false
