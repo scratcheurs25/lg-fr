@@ -1,9 +1,11 @@
-VARIABLE x TYPE TEXT.
-METTRE x à ENTRER.
-SI x = <1> ALORS.
+VARIABLE x TYPE ENTIER.
+SI VRAIS ALORS.
     REPETER.
-        IMPRIMER 1.
+        METTRE x à x + 1.
+        AFFICHER x.
+        SI x = 100 ALORS.
+            STOP.
+        FIN.
     FIN.
-SINON.
-    AFFICHER 0.
 FIN.
+AFFICHER x.

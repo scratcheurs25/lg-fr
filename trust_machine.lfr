@@ -1,0 +1,8 @@
+VARIABLE input TYPE TEXT.
+METTRE input à ENTRER.
+SI input = <1> ALORS.
+    REPETER.
+        IMPRIMER 1.
+    FIN.
+FIN.
+IMPRIMER 0.

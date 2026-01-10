@@ -1,14 +1,16 @@
 import argparse
 
 variable = {}
+fonction = {}#"test" : ([nom_variable],line debut , line fin)
 class Type:
     def __init__(self,keyword,baseValue):
         self.keyword = keyword
         self.baseValue = baseValue
 class variables:
-    def __init__(self,_type:Type,value):
+    def __init__(self,_type:Type,value,scope):
         self.type = _type
         self.value =value
+        self.scope = scope
 
 entier = Type("ENTIER",0)
 booleen = Type("BOOLEEN","faux")
@@ -16,7 +18,8 @@ decimal = Type("DECIMAL","0,0")
 text = Type("TEXT","")
 type_list = [entier,booleen,decimal,text]
 
-code_stack = []
+code_stack = [("entry point",0)]
+FONC_list  = []
 
 def eval(file):
     global variable
@@ -30,8 +33,8 @@ def eval(file):
         #    continue
         program_compter = eval_line(line,program_compter,lines)
     #for i in variable:
-    #    print(f"{i} , {variable.get(i).type.keyword} , {variable.get(i).value}")
-
+    #    print(f"{i} , {variable.get(i).type.keyword} , {variable.get(i).value} , {variable.get(i).scope}")
+    #print(FONC_list)
 def scan_program(lines,line_end,get):
     stack = []
     last_get = 0
@@ -40,6 +43,7 @@ def scan_program(lines,line_end,get):
         keyword.replace(" ","")
         keyword = keyword.replace('\xa0', '')
         if keyword == "REPETER": stack.append(("REPETER",i))
+        if keyword == "FONCTION": stack.append(("FONCTION", i))
         if keyword == "SI": stack.append(("SI", i))
         if keyword == "FIN" :
             stack.pop()
@@ -56,6 +60,7 @@ def scan_end(lines,line_bloc):
         keyword = lines[i].split()[0]
         if keyword == "REPETER": stack.append(("REPETER", i))
         if keyword == "SI": stack.append(("SI", i))
+        if keyword == "FONCTION": stack.append(("FONCTION", i))
         if keyword == "FIN" or keyword == "SINON":
             value = stack.pop()
             if value[1] == line_bloc and (value[0] == "SI" or keyword == "FIN"):
@@ -65,7 +70,8 @@ def scan_end(lines,line_bloc):
 def eval_line(line:str,pro:int,program):
     global variable,type_list
     line = line.lstrip()
-    keyword = ["VARIABLE","METTRE","AFFICHER","REPETER","FIN","STOP","SI","IMPRIMER","SINON"]
+    line = line.replace(":", " :")
+    keyword = ["VARIABLE","METTRE","AFFICHER","REPETER","FIN","STOP","SI","IMPRIMER","SINON","FONCTION"]
     line_split = line.split()
     keyword_use = line_split[0]
     if keyword_use in keyword:
@@ -77,14 +83,14 @@ def eval_line(line:str,pro:int,program):
                         _Type = e
                 if line_split[2] != "TYPE":
                     raise TypeError(f"Une variable est definis sans TYPE , {line}")
-                variable[line_split[1]] = variables(_Type,_Type.baseValue)
+                variable[line_split[1]] = variables(_Type,_Type.baseValue,code_stack[:])
             case "METTRE":
                 if line_split[2] != "Ã":
                     raise TypeError(f"METTRE doit avoir un à , {line}")
                 expr = line[len(f"{line_split[0]} {line_split[1]} à"):]
                 value , type = eval_expr(expr)
                 value = bool_replace(type,value)
-                variable.get(line_split[1]).value = value
+                variable.get(get_var(line_split[1],code_stack)).value = value
             case "AFFICHER":
                 expr = line[len(f"{line_split[0]}"):]
                 variable_afficher , type = eval_expr(expr)
@@ -107,7 +113,11 @@ def eval_line(line:str,pro:int,program):
                     raise TypeError("pas de fin d'un sinon")
             case "STOP":
                 last_repeter = scan_program(program,pro,"REPETER")
-                jmp_to = scan_end(program,last_repeter)
+                jmp_to = scan_end(program,last_repeter)[0]
+                value , line = (None,None)
+                while not value == "rep":
+                    value , line = code_stack.pop()#enleve tout les fonction jusqu'aux repeter le plus proche
+
                 return jmp_to + 1
             case "SI":
                 code_stack.append(("si", pro))
@@ -116,7 +126,28 @@ def eval_line(line:str,pro:int,program):
                 value = bool_replace(type, value)
                 if value != "VRAIS":
                     jmp_to , keyword = scan_end(program,pro)
-                    return jmp_to + (1 if keyword == "FIN" else 0)
+                    return jmp_to
+            case "FONCTION":
+                name = line_split[1]
+                is_in_func = code_stack[len(code_stack) - 1][0] == name
+                if is_in_func:
+                    variables_str = line[len(f"{line_split[0]} {name}, :"):]
+                    variables_str_list = variables_str.split()
+                    num_var = int(len(variables_str_list)/3)
+                    for i in range(num_var):
+                        var = i * 3
+                        _name = variables_str_list[var]
+                        _TYPE_keyword = variables_str_list[var + 1]
+                        _TYPE = variables_str_list[var + 2]
+                        _Type = entier
+                        for e in type_list:
+                            if e.keyword == _TYPE:
+                                _Type = e
+                        variable[_name] = variables(_Type,_Type.baseValue,code_stack[:])
+                else:
+                    FONC_list.append((name,pro))
+                    jmp_to, keyword = scan_end(program, pro)
+                    return jmp_to + 1
     return  pro + 1
 def bool_replace(type,value):
     if type == "bool":
@@ -126,6 +157,18 @@ def bool_replace(type,value):
             case 1:
                 value = "VRAIS"
     return value
+
+def get_var(name,scope):
+    try:
+        var = variable[name]
+        var_scope = var.scope[len(var.scope) - 1]#recupere le dernier element de la liste
+        if var_scope in scope:
+            return name
+        else:
+            raise TypeError(f"varaible non defini dans le scope actuelle , {scope}")
+    except:
+        raise TypeError("varaible non defini")
+
 
 def replace_notSring(expr):
     stack = []
@@ -211,7 +254,7 @@ def eval_expr(expr : str):
     else:
 
         if expr in variable :
-            _variable = variable[expr]
+            _variable = variable[get_var(expr,code_stack)]
             if _variable.type.keyword == "ENTIER" : return _variable.value , "int"
             if _variable.type.keyword == "BOOLEEN":
                 match _variable.value:
