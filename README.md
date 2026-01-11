@@ -54,7 +54,7 @@ METTRE exemple2 à <hello > + <world>.
 METTRE exemple3 à !((exemple1 COMME TEXT) = exemple2).
 ```
 - `COMME` convertit entre types (ex : convertir un entier en texte).
-- Les opérateurs admis entre parenthèses sont un seul opérateur par parenthèse : `+ - * / = COMME !`
+- Les opérateurs entre parenthèses sont les seuls opérateur accepter dans cette parenthèse : `+ - * / = COMME !`
 
 Conditions
 ```lg-fr
@@ -68,7 +68,7 @@ FIN.
 Boucles
 ```lg-fr
 REPETER.
-    AFFICHER <ceci est affiche indefiniment>.
+    AFFICHER <ceci est afficher indefiniment>.
 FIN.
 ```
 - Pour arrêter une boucle depuis l'intérieur : `STOP`.
