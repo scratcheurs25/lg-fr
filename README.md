@@ -1,89 +1,90 @@
-# lg-fr , le language de programation fait pour les français
+# lg-fr — Le langage de programmation pour les francophones
 
+lg-fr est un petit langage de programmation pensé pour les francophones, conçu comme étape intermédiaire entre les langages visuels (type Scratch) et Python. Les fichiers source ont l'extension `.lfr` et sont écrits en texte (non par blocs).
 
-Ce language est créer pour que de nouveaux developeur puisse créer des projet en utilisant du text , et non des block .
+Ce dépôt contient :
+- Un interpréteur/runner en Python : `main.py`
+- Des exemples de programmes `.lfr`
+- Un fichier `notepad++.xml` pour la coloration Notepad++
 
-Ce projet permmet d'avoir une étapes entre les language visuelle (scratch) et Python
+## Prérequis
 
-le fichier code sont en .lfr
+- Python 3.x installé
+- (Optionnel) Notepad++ si vous souhaitez importer la coloration
 
-pour lancer un fichier il faut d'abord installer l'interpreteur https://github.com/scratcheurs25/lg-fr/blob/master/main.py.
+## Installation et exécution
 
-Puis installer Python.
+1. Cloner le dépôt ou télécharger les fichiers.
+2. Exécuter un fichier `.lfr` avec Python, par exemple :
+   ```bash
+   python main.py nom_du_programme.lfr
+   ```
+## Syntaxe de base
 
-pour coder dans ce language il est recomander d'installer notepad++ et d'y ajouter le language notepad++.xml
+- Chaque instruction se termine par un point `.`.
+- Chaînes littérales sont écrites entre chevrons : `<bonjour>`.
+- Exemples d'instructions :
 
-# Comment fonctionne le language
-
-le code pour le hello world est le suivant
-
-
-
+Hello world
 ```lg-fr
 AFFICHER <hello world>.
 ```
 
-chaque ligne doit ce finir par un point .
-
-Comment on créer une vraiable
-
+Déclaration de variables
 ```lg-fr
 VARIABLE exemple1 TYPE ENTIER.
-//ceci créer une variable entier (int).
+// entier (int).
 VARIABLE exemple2 TYPE TEXT.
-//ceci créer une vraiable text (str).
+// texte (str).
 VARIABLE exemple3 TYPE BOOLEEN.
-//ceci créer une vraiable booleen (bool).
+// booléen (bool).
 ```
 
-et comment on les modifie
+Affectation
 ```lg-fr
 METTRE exemple1 à 15.
 METTRE exemple2 à <hello world>.
 METTRE exemple3 à VRAIS.
 ```
 
-on peut aussi faire des opperation
+Opérations et conversions
 ```lg-fr
 METTRE exemple1 à (25*3).
 METTRE exemple2 à <hello > + <world>.
-METTRE exemple3 à !((exemple1 COMME TEXT) = exemple2). 
+METTRE exemple3 à !((exemple1 COMME TEXT) = exemple2).
 ```
-le COMME traduis l'entier 75 en le text <75>
+- `COMME` convertit entre types (ex : convertir un entier en texte).
+- Les opérateurs admis entre parenthèses sont un seul opérateur par parenthèse : `+ - * / = COMME !`
 
-on peut avec des booleen faire des condition avec le si
-
+Conditions
 ```lg-fr
 SI !((exemple1 COMME TEXT) = exemple2) ALORS.
-    AFFICHER <exemple 1 pas egal à exemple2>
+    AFFICHER <exemple 1 pas egal à exemple2>.
 SINON.
-    AFFICHER <exemple 1 egal à exemple2>
+    AFFICHER <exemple 1 egal à exemple2>.
 FIN.
 ```
-il peut y avoir que 1 opperateur par parentaise (+ - * / = COMME !)
 
-enfin on peut repeter des action
+Boucles
 ```lg-fr
 REPETER.
-    AFFICHER <ceci est afficher indefiniment>.
+    AFFICHER <ceci est affiche indefiniment>.
 FIN.
 ```
-on peut arreter une boucle avec STOP
-
+- Pour arrêter une boucle depuis l'intérieur : `STOP`.
 ```lg-fr
 VARIABLE exemple TYPE ENTIER.
 REPETER.
-    AFFICHER exemple.
-    METTRE exemple à exemple + 1.
-    SI exemple = 100 ALORS.
-        STOP.
-    FIN.
+	AFFICHER exemple.
+	METTRE exemple à exemple + 1.
+	SI exemple = 100 ALORS.
+		STOP.
+	FIN.
 FIN.
+
 ```
 
-# exemple de code
-se code calcule entrer1 ^ entrer2
-
+Exemple — calculer entrer1 ^ entrer2 (puissance par itération)
 ```lg-fr
 VARIABLE entrer1 TYPE ENTIER.
 VARIABLE entrer2 TYPE ENTIER.
@@ -94,14 +95,27 @@ VARIABLE index TYPE ENTIER.
 VARIABLE result TYPE ENTIER.
 METTRE result à 1.
 REPETER.
-	
-	METTRE result à result * entrer1.
-	METTRE index à index + 1.
-	SI index = entrer2 ALORS.
-		STOP.
-	FIN.
+    METTRE result à result * entrer1.
+    METTRE index à index + 1.
+    SI index = entrer2 ALORS.
+        STOP.
+    FIN.
 FIN.
 AFFICHER result.
 ```
 
+## Éditeur
 
+- Importez `notepad++.xml` dans Notepad++ pour la coloration du langage `.lfr` :
+  https://github.com/scratcheurs25/lg-fr/blob/master/notepad%2B%2B.xml
+
+## Améliorations recommandées
+
+- Ajouter un fichier `requirements.txt` ou `pyproject.toml` si `main.py` a des dépendances externes.
+- Documenter la ligne de commande exacte et les options de `main.py`.
+- Ajouter des exemples supplémentaires et des tests.
+- Ajouter un fichier LICENSE pour préciser la licence d'utilisation.
+
+## Contribution
+
+Contributions bienvenues : ouvrez une issue ou proposez une pull request.
