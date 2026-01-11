@@ -1,0 +1,17 @@
+VARIABLE entrer1 TYPE ENTIER.
+VARIABLE entrer2 TYPE ENTIER.
+METTRE entrer1 à ENTRER COMME ENTIER.
+METTRE entrer2 à ENTRER COMME ENTIER.
+
+VARIABLE index TYPE ENTIER.
+VARIABLE result TYPE ENTIER.
+METTRE result à 1.
+REPETER.
+	
+	METTRE result à result * entrer1.
+	METTRE index à index + 1.
+	SI index = entrer2 ALORS.
+		STOP.
+	FIN.
+FIN.
+AFFICHER result.
