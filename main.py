@@ -7,10 +7,13 @@ class Type:
         self.keyword = keyword
         self.baseValue = baseValue
 class variables:
-    def __init__(self,_type:Type,value,scope):
+    def __init__(self,_type:Type,value):
         self.type = _type
         self.value =value
-        self.scope = scope
+class fonction:
+    def __init__(self,line,args):
+        self.line = line
+        self.args = args
 
 entier = Type("ENTIER",0)
 booleen = Type("BOOLEEN","faux")
@@ -19,7 +22,15 @@ text = Type("TEXT","")
 type_list = [entier,booleen,decimal,text]
 
 code_stack = [("entry point",0)]
-FONC_list  = []
+
+def print_var():
+    for i in variable:
+        for y in variable.get(i):
+            _name = i
+            _scope = y
+            _value = variable.get(i).get(y).value
+            _keyword = variable.get(i).get(y).type.keyword
+            print(_name,_scope,_value,_keyword)
 
 def eval(file):
     global variable
@@ -32,9 +43,7 @@ def eval(file):
         #if line.startswith("//"):
         #    continue
         program_compter = eval_line(line,program_compter,lines)
-    #for i in variable:
-    #    print(f"{i} , {variable.get(i).type.keyword} , {variable.get(i).value} , {variable.get(i).scope}")
-    #print(FONC_list)
+
 def scan_program(lines,line_end,get):
     stack = []
     last_get = 0
@@ -78,19 +87,24 @@ def eval_line(line:str,pro:int,program):
         match keyword_use:
             case "VARIABLE":
                 _Type = entier
+                _name = line_split[1]
                 for e in type_list:
                     if e.keyword == line_split[3]:
                         _Type = e
                 if line_split[2] != "TYPE":
                     raise TypeError(f"Une variable est definis sans TYPE , {line}")
-                variable[line_split[1]] = variables(_Type,_Type.baseValue,code_stack[:])
+                if _name not in variable:
+                    variable[_name] = {}
+
+                variable[_name][tuple(code_stack)] = variables(_Type,_Type.baseValue)
             case "METTRE":
                 if line_split[2] != "Ã":
                     raise TypeError(f"METTRE doit avoir un à , {line}")
                 expr = line[len(f"{line_split[0]} {line_split[1]} à"):]
                 value , type = eval_expr(expr)
                 value = bool_replace(type,value)
-                variable.get(get_var(line_split[1],code_stack)).value = value
+                _var_name , _var_scope = get_var(line_split[1],code_stack)
+                variable[_var_name][tuple(_var_scope)].value = value
             case "AFFICHER":
                 expr = line[len(f"{line_split[0]}"):]
                 variable_afficher , type = eval_expr(expr)
@@ -131,9 +145,17 @@ def eval_line(line:str,pro:int,program):
                 name = line_split[1]
                 is_in_func = code_stack[len(code_stack) - 1][0] == name
                 if is_in_func:
+                    _fonction = fonction[name]
+                    for i in _fonction.args:
+                        _var = _fonction.args.get(i)
+                        _var.scope = code_stack
+                        variable[i] = _var
+
+                else:
+                    var_list = {}
                     variables_str = line[len(f"{line_split[0]} {name}, :"):]
                     variables_str_list = variables_str.split()
-                    num_var = int(len(variables_str_list)/3)
+                    num_var = int(len(variables_str_list) / 3)
                     for i in range(num_var):
                         var = i * 3
                         _name = variables_str_list[var]
@@ -143,9 +165,8 @@ def eval_line(line:str,pro:int,program):
                         for e in type_list:
                             if e.keyword == _TYPE:
                                 _Type = e
-                        variable[_name] = variables(_Type,_Type.baseValue,code_stack[:])
-                else:
-                    FONC_list.append((name,pro))
+                        var_list[_name] = variables(_Type, _Type.baseValue, [])
+                    fonction[name] = fonction(pro,var_list)
                     jmp_to, keyword = scan_end(program, pro)
                     return jmp_to + 1
     return  pro + 1
@@ -159,15 +180,27 @@ def bool_replace(type,value):
     return value
 
 def get_var(name,scope):
-    try:
-        var = variable[name]
-        var_scope = var.scope[len(var.scope) - 1]#recupere le dernier element de la liste
-        if var_scope in scope:
-            return name
-        else:
-            raise TypeError(f"varaible non defini dans le scope actuelle , {scope}")
-    except:
-        raise TypeError("varaible non defini")
+    #get var dict
+    """
+        var
+        {
+        name: {
+        scope : var
+        scope : var
+        }
+
+        }
+
+    """
+    _var_dic = variable[name]
+    _scope = scope[:]
+    while not (tuple(_scope) in _var_dic):
+        if len(_scope) == 1:
+            raise TypeError(f"variable indefini, dans le scope acctuelle,{name},{scope}")
+        _scope.pop()
+
+    return name , _scope
+
 
 
 def replace_notSring(expr):
@@ -254,7 +287,8 @@ def eval_expr(expr : str):
     else:
 
         if expr in variable :
-            _variable = variable[get_var(expr,code_stack)]
+            _var_name , _var_scope = get_var(expr,code_stack)
+            _variable = variable[_var_name][tuple(_var_scope)]
             if _variable.type.keyword == "ENTIER" : return _variable.value , "int"
             if _variable.type.keyword == "BOOLEEN":
                 match _variable.value:

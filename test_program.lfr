@@ -1,11 +1,4 @@
 VARIABLE x TYPE ENTIER.
-SI VRAIS ALORS.
-    REPETER.
-        METTRE x à x + 1.
-        AFFICHER x.
-        SI x = 100 ALORS.
-            STOP.
-        FIN.
-    FIN.
+SI 0 = 0 ALORS.
+	VARIABLE x TYPE ENTIER.
 FIN.
-AFFICHER x.
