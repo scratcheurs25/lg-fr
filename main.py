@@ -1,7 +1,8 @@
 import argparse
+import time
 
 variable = {}
-fonction = {}#"test" : ([nom_variable],line debut , line fin)
+fonctions = {}#"test" : ([nom_variable],line debut , line fin)
 class Type:
     def __init__(self,keyword,baseValue):
         self.keyword = keyword
@@ -80,7 +81,7 @@ def eval_line(line:str,pro:int,program):
     global variable,type_list
     line = line.lstrip()
     line = line.replace(":", " :")
-    keyword = ["VARIABLE","METTRE","AFFICHER","REPETER","FIN","STOP","SI","IMPRIMER","SINON","FONCTION"]
+    keyword = ["VARIABLE","METTRE","AFFICHER","REPETER","FIN","STOP","SI","IMPRIMER","SINON","FONCTION","EXECUTER"]
     line_split = line.split()
     keyword_use = line_split[0]
     if keyword_use in keyword:
@@ -95,8 +96,8 @@ def eval_line(line:str,pro:int,program):
                     raise TypeError(f"Une variable est definis sans TYPE , {line}")
                 if _name not in variable:
                     variable[_name] = {}
+                set_var(_name,code_stack,_Type,_Type.baseValue)
 
-                variable[_name][tuple(code_stack)] = variables(_Type,_Type.baseValue)
             case "METTRE":
                 if line_split[2] != "Ã":
                     raise TypeError(f"METTRE doit avoir un à , {line}")
@@ -118,9 +119,11 @@ def eval_line(line:str,pro:int,program):
             case "REPETER":
                 code_stack.append(("rep",pro))
             case "FIN":
-                value , line = code_stack.pop()
+                value , _line = code_stack.pop()
                 if value == "rep":
-                    return line
+                    return _line
+                if value == "exec":
+                    return _line + 1
             case "SINON":
                 code_stack.append(("SINON",pro))
                 if not scan_end(program,pro):
@@ -128,9 +131,9 @@ def eval_line(line:str,pro:int,program):
             case "STOP":
                 last_repeter = scan_program(program,pro,"REPETER")
                 jmp_to = scan_end(program,last_repeter)[0]
-                value , line = (None,None)
+                value , _line = (None,None)
                 while not value == "rep":
-                    value , line = code_stack.pop()#enleve tout les fonction jusqu'aux repeter le plus proche
+                    value , _line = code_stack.pop()#enleve tout les fonction jusqu'aux repeter le plus proche
 
                 return jmp_to + 1
             case "SI":
@@ -144,14 +147,7 @@ def eval_line(line:str,pro:int,program):
             case "FONCTION":
                 name = line_split[1]
                 is_in_func = code_stack[len(code_stack) - 1][0] == name
-                if is_in_func:
-                    _fonction = fonction[name]
-                    for i in _fonction.args:
-                        _var = _fonction.args.get(i)
-                        _var.scope = code_stack
-                        variable[i] = _var
-
-                else:
+                if not is_in_func:
                     var_list = {}
                     variables_str = line[len(f"{line_split[0]} {name}, :"):]
                     variables_str_list = variables_str.split()
@@ -165,10 +161,17 @@ def eval_line(line:str,pro:int,program):
                         for e in type_list:
                             if e.keyword == _TYPE:
                                 _Type = e
-                        var_list[_name] = variables(_Type, _Type.baseValue, [])
-                    fonction[name] = fonction(pro,var_list)
+                        var_list[_name] = variables(_Type, _Type.baseValue)
+                    fonctions[name] = fonction(pro,var_list)
                     jmp_to, keyword = scan_end(program, pro)
                     return jmp_to + 1
+                else:
+                    code_stack.pop()
+            case "EXECUTER":
+                _line = fonctions[line_split[1]].line
+                code_stack.append(("exec",pro))#return pointer
+                code_stack.append((line_split[1],_line))
+                return _line
     return  pro + 1
 def bool_replace(type,value):
     if type == "bool":
@@ -201,6 +204,8 @@ def get_var(name,scope):
 
     return name , _scope
 
+def set_var(_var_name,scope,_type,value):
+    variable[_var_name][tuple(code_stack)] = variables(_type,value)
 
 
 def replace_notSring(expr):

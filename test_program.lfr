@@ -1,4 +1,12 @@
-VARIABLE x TYPE ENTIER.
-SI 0 = 0 ALORS.
-	VARIABLE x TYPE ENTIER.
+FONCTION hello_world: args TYPE ENTIER.
+	AFFICHER <hello world>.
+FIN.
+VARIABLE index TYPE ENTIER.
+
+REPETER.
+	METTRE index à index + 1.
+	EXECUTER hello_world : 1.
+	SI index = 3 ALORS.
+		STOP.
+	FIN.
 FIN.
