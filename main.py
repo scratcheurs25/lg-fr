@@ -7,17 +7,21 @@ class Type:
     def __init__(self,keyword,baseValue):
         self.keyword = keyword
         self.baseValue = baseValue
+    def __repr__(self):
+        return f"{self.keyword}"
 class variables:
     def __init__(self,_type:Type,value):
         self.type = _type
         self.value =value
+    def __repr__(self):
+        return f"{self.type} , {self.value}"
 class fonction:
     def __init__(self,line,args):
         self.line = line
         self.args = args
 
 entier = Type("ENTIER",0)
-booleen = Type("BOOLEEN","faux")
+booleen = Type("BOOLEEN","FAUX")
 decimal = Type("DECIMAL","0,0")
 text = Type("TEXT","")
 type_list = [entier,booleen,decimal,text]
@@ -170,7 +174,21 @@ def eval_line(line:str,pro:int,program):
             case "EXECUTER":
                 _line = fonctions[line_split[1]].line
                 code_stack.append(("exec",pro))#return pointer
-                code_stack.append((line_split[1],_line))
+                _fonc = fonctions[line_split[1]]
+                _var_list = _fonc.args
+
+                arg = line[len(f"EXECUTER {line_split[1]} : "):]
+                args = arg.split(",")
+                for i in range(len(args)):
+                    args[i] = eval_expr(args[i])[0]
+                y = 0
+                for i in _var_list:
+                    if i not in variable:
+                        variable[i] = {}
+                    _var = _var_list.get(i)
+                    set_var(i,code_stack,_var.type,args[y])
+                    y += 1
+                code_stack.append((line_split[1], _line))
                 return _line
     return  pro + 1
 def bool_replace(type,value):
@@ -270,6 +288,7 @@ def eval_expr(expr : str):
             if type_left == "bool":
                 if do_op == "COMME":
                     if value_right == "ENTIER": return value_left, "int"
+                    if value_right == "TEXT": return bool_replace("bool",int(value_left)) , "str"
                 else:
                     raise TypeError("undefined type")
             if type_left == "str":
@@ -297,7 +316,7 @@ def eval_expr(expr : str):
             if _variable.type.keyword == "ENTIER" : return _variable.value , "int"
             if _variable.type.keyword == "BOOLEEN":
                 match _variable.value:
-                    case "FAUX":return 0 , "bool"
+                    case "FAUX": return 0 , "bool"
                     case "VRAIS":return 1 , "bool"
 
             if _variable.type.keyword == "TEXT": return _variable.value, "str"

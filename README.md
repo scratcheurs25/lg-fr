@@ -83,6 +83,14 @@ REPETER.
 FIN.
 
 ```
+- Pour créer une fonction
+```lg-fr
+FONCTION exemple : text TYPE TEXT.
+    AFFICHER text.
+FIN.
+
+EXECUTER exemple : <hello world>.
+```
 
 Exemple — calculer entrer1 ^ entrer2 (puissance par itération)
 ```lg-fr
@@ -111,11 +119,9 @@ AFFICHER result.
 
 ## Améliorations recommandées
 
-- Ajouter un fichier `requirements.txt` ou `pyproject.toml` si `main.py` a des dépendances externes.
-- Documenter la ligne de commande exacte et les options de `main.py`.
-- Ajouter des exemples supplémentaires et des tests.
-- Ajouter un fichier LICENSE pour préciser la licence d'utilisation.
-
+- ajouter un garbage collector.
+- ajouter des fonction qui retourne des valeur.
+- recoder l'interpreteur avec un LEXER , PARSER , INTERPRETEUR. 
 ## Contribution
 
 Contributions bienvenues : ouvrez une issue ou proposez une pull request.

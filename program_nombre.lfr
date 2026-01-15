@@ -1,0 +1,7 @@
+FONCTION afficher_nombre : nombre TYPE ENTIER nombre2 TYPE ENTIER.
+	AFFICHER nombre COMME TEXT.
+	AFFICHER nombre2 COMME TEXT.
+FIN.
+
+EXECUTER afficher_nombre : 256 , 3000.
+EXECUTER afficher_nombre : 550 , 2220.
