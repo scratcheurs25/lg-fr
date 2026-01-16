@@ -119,7 +119,6 @@ AFFICHER result.
 
 ## Améliorations recommandées
 
-- ajouter un garbage collector.
 - ajouter des fonction qui retourne des valeur.
 - recoder l'interpreteur avec un LEXER , PARSER , INTERPRETEUR. 
 ## Contribution

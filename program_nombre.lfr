@@ -1,7 +1,12 @@
-FONCTION afficher_nombre : nombre TYPE ENTIER nombre2 TYPE ENTIER.
+VARIABLE nombre_de_pos TYPE ENTIER.
+FONCTION afficher_nombre : nombre TYPE ENTIER.
 	AFFICHER nombre COMME TEXT.
-	AFFICHER nombre2 COMME TEXT.
+	METTRE nombre_de_pos à nombre_de_pos + 1.
+	SI !(nombre = 0) ALORS.
+		EXECUTER afficher_nombre : nombre - 1.
+		EXECUTER afficher_nombre : nombre - 1.
+	FIN.
 FIN.
 
-EXECUTER afficher_nombre : 256 , 3000.
-EXECUTER afficher_nombre : 550 , 2220.
+EXECUTER afficher_nombre : ENTRER COMME ENTIER.
+AFFICHER nombre_de_pos.

@@ -35,7 +35,7 @@ def print_var():
             _scope = y
             _value = variable.get(i).get(y).value
             _keyword = variable.get(i).get(y).type.keyword
-            print(_name,_scope,_value,_keyword)
+            print(_name,_scope,_value,_keyword,"\n")
 
 def eval(file):
     global variable
@@ -48,6 +48,7 @@ def eval(file):
         #if line.startswith("//"):
         #    continue
         program_compter = eval_line(line,program_compter,lines)
+    #print_var()
 
 def scan_program(lines,line_end,get):
     stack = []
@@ -123,6 +124,7 @@ def eval_line(line:str,pro:int,program):
             case "REPETER":
                 code_stack.append(("rep",pro))
             case "FIN":
+                garbage_colector(code_stack)
                 value , _line = code_stack.pop()
                 if value == "rep":
                     return _line
@@ -225,6 +227,16 @@ def get_var(name,scope):
 def set_var(_var_name,scope,_type,value):
     variable[_var_name][tuple(code_stack)] = variables(_type,value)
 
+def garbage_colector(_scope):
+    _var_list = get_variable_in_scope(_scope)
+    for e in _var_list:
+        variable[e].pop(tuple(_scope))
+
+def get_variable_in_scope(_scope):
+    var_list = []
+    for e in variable:
+        if tuple(_scope) in variable[e]:var_list.append(e)
+    return var_list
 
 def replace_notSring(expr):
     stack = []
